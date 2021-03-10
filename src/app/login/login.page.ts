@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
@@ -13,12 +13,17 @@ import { login } from '@app/store/actions';
 export class LoginPage implements OnInit {
   email: string;
   password: string;
+  darkMode: boolean;
 
   errorMessage$: Observable<string>;
 
-  constructor(private store: Store<State>) {}
+  constructor(private store: Store<State>, private zone: NgZone) {}
 
   ngOnInit() {
+    const query = window.matchMedia('(prefers-color-scheme: dark)');
+    this.darkMode = query.matches;
+    query.addListener(e => this.zone.run(() => (this.darkMode = e.matches)));
+
     this.errorMessage$ = this.store.select(selectAuthErrorMessage);
   }
 
